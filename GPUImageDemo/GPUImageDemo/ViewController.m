@@ -426,6 +426,7 @@ typedef NS_ENUM(NSUInteger, SizeOfPictureType) {
     }
 }
 
+
 //-(JKCameraButton *)creatCaptureButton{
 //    if (!_captureButton) {
 //        _captureButton = [[JKCameraButton alloc]initWithFrame:CGRectMake(WIDTH/2-60/2, HEIGHT-70, 60, 60) superView:self.view];
@@ -443,8 +444,8 @@ typedef NS_ENUM(NSUInteger, SizeOfPictureType) {
     self.finishBoard.enable = NO;
     [self captureFlashWithMode:_captureLightMode];
     [_photoCamera capturePhotoAsJPEGProcessedUpToFilter:_filterGroup withCompletionHandler:^(NSData *processedJPEG, NSError *error){
+        
         [self captureFlashWithMode:AVCaptureTorchModeOff];
-
         UIImage *image = [UIImage imageWithData:processedJPEG];
         [self saveImage:image assetCollectionName:[self appName]];
         
@@ -619,7 +620,6 @@ typedef NS_ENUM(NSUInteger, SizeOfPictureType) {
     GPUImageStillCamera *photoCamera = [[GPUImageStillCamera alloc] initWithSessionPreset:AVCaptureSessionPresetHigh cameraPosition:AVCaptureDevicePositionFront];
     photoCamera.outputImageOrientation = UIDeviceOrientationPortrait;
     [photoCamera setHorizontallyMirrorFrontFacingCamera:YES];
-    [photoCamera setHorizontallyMirrorRearFacingCamera:YES];
     /*
      UIDeviceOrientationUnknown,
      UIDeviceOrientationPortrait,            // Device oriented vertically, home button on the bottom
