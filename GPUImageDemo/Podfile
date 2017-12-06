@@ -1,0 +1,9 @@
+platform :ios,'8.0'
+
+target 'GPUImageDemo' do
+
+	pod 'GPUImage'
+	pod 'pop'
+    pod 'Masonry'
+
+end
