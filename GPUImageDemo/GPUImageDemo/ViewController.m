@@ -17,6 +17,10 @@
 #import "JKCaptureFinishBoard.h"
 #import "JKCameraNavigationBar.h"
 #import "JKCameraMoreFunction.h"
+#import "PHManager.h"
+#import "SystemInvestigator.h"
+
+
 
 
 typedef NS_ENUM(NSUInteger, SliderResponder) {
@@ -30,7 +34,7 @@ typedef NS_ENUM(NSUInteger, SizeOfPictureType) {
     SizeOfPictureType1x1,
 };
 
-@interface ViewController ()<UIGestureRecognizerDelegate, JKCameraMoreFunctionDelegate>
+@interface ViewController ()<UIGestureRecognizerDelegate, JKCameraMoreFunctionDelegate, PHManagerDelegate>
 
 @property (nonatomic, strong) GPUImageView *captureVideoPreview;//录像预览
 @property (nonatomic, strong) GPUImageMovieWriter *movieWriter;//视频写入管理器
@@ -64,6 +68,8 @@ typedef NS_ENUM(NSUInteger, SizeOfPictureType) {
 @property (nonatomic, assign) BOOL delayCapture;
 @property (nonatomic, assign) AVCaptureTorchMode captureLightMode;
 
+@property (nonatomic, strong) PHManager *phManager;
+
 @end
 
 @implementation ViewController{
@@ -95,6 +101,14 @@ typedef NS_ENUM(NSUInteger, SizeOfPictureType) {
     tap.delegate = self;
     [self.view addGestureRecognizer:tap];
 //    _captureButton = [self creatCaptureButton];
+}
+
+-(PHManager *)phManager{
+    if (!_phManager) {
+        _phManager = [[PHManager alloc]init];
+        _phManager.delegate = self;
+    }
+    return _phManager;
 }
 
 -(GPUImageFilterGroup *)filterGroup{
@@ -447,7 +461,7 @@ typedef NS_ENUM(NSUInteger, SizeOfPictureType) {
         
         [self captureFlashWithMode:AVCaptureTorchModeOff];
         UIImage *image = [UIImage imageWithData:processedJPEG];
-        [self saveImage:image assetCollectionName:[self appName]];
+        [self.phManager saveImage:image assetCollectionName:[SystemInvestigator appName]];
         
     }];
     
@@ -477,13 +491,7 @@ typedef NS_ENUM(NSUInteger, SizeOfPictureType) {
             size = CGSizeMake(WIDTH, HEIGHT);
             break;
     }
-//    if ([_photoCamera.captureSessionPreset isEqualToString:AVCaptureSessionPresetHigh]) {//16x9
-////        size = CGSizeMake(WIDTH, HEIGHT);
-//    }else if ([_photoCamera.captureSessionPreset isEqualToString:AVCaptureSessionPresetPhoto]){//1x1
-//        size = CGSizeMake(WIDTH, WIDTH);
-//    }else if ([_photoCamera.captureSessionPreset isEqualToString:AVCaptureSessionPreset640x480]){//4x3
-//        size = CGSizeMake(480.0, 640.0);
-//    }
+
     _movieWriter = [[GPUImageMovieWriter alloc] initWithMovieURL:movieURL size:size];
     _movieWriter.encodingLiveVideo = YES;
     _movieWriter.shouldPassthroughAudio = YES;
@@ -513,96 +521,16 @@ typedef NS_ENUM(NSUInteger, SizeOfPictureType) {
     UISaveVideoAtPathToSavedPhotosAlbum(pathToMovie, nil, nil, nil);
 }
 
-- (void)saveImage:(UIImage *)image assetCollectionName:(NSString *)collectionName {
-    
-    // 1. 获取当前App的相册授权状态
-    PHAuthorizationStatus authorizationStatus = [PHPhotoLibrary authorizationStatus];
-    
-    // 2. 判断授权状态
-    if (authorizationStatus == PHAuthorizationStatusAuthorized) {
-        
-        // 2.1 如果已经授权, 保存图片(调用步骤2的方法)
-        [self saveImage:image toCollectionWithName:collectionName];
-        
-    } else if (authorizationStatus == PHAuthorizationStatusNotDetermined) { // 如果没决定, 弹出指示框, 让用户选择
-        
-        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-            // 如果用户选择授权, 则保存图片
-            if (status == PHAuthorizationStatusAuthorized) {
-                [self saveImage:image toCollectionWithName:collectionName];
-            }
-        }];
-        
-    } else {
-        
-//        [SVProgressHUD showWithStatus:@"请在设置界面, 授权访问相册"];
-    }
+#pragma mark - PHManager delegate -
+
+-(void)saveimageFinish{
+    self.finishBoard.enable = NO;
+    // [SVProgressHUD showSuccessWithStatus:@"保存成功"];
 }
 
-
-// 保存图片
-- (void)saveImage:(UIImage *)image toCollectionWithName:(NSString *)collectionName {
-    
-    // 1. 获取相片库对象
-    PHPhotoLibrary *library = [PHPhotoLibrary sharedPhotoLibrary];
-    // 2. 调用changeBlock
-    [library performChanges:^{
-        
-        // 2.1 创建一个相册变动请求
-        PHAssetCollectionChangeRequest *collectionRequest;
-        
-        // 2.2 取出指定名称的相册
-        PHAssetCollection *assetCollection = [self getCurrentPhotoCollectionWithTitle:collectionName];
-        
-        // 2.3 判断相册是否存在
-        if (assetCollection) { // 如果存在就使用当前的相册创建相册请求
-            collectionRequest = [PHAssetCollectionChangeRequest changeRequestForAssetCollection:assetCollection];
-        } else { // 如果不存在, 就创建一个新的相册请求
-            collectionRequest = [PHAssetCollectionChangeRequest creationRequestForAssetCollectionWithTitle:collectionName];
-        }
-        
-        // 2.4 根据传入的相片, 创建相片变动请求
-        PHAssetChangeRequest *assetRequest = [PHAssetChangeRequest creationRequestForAssetFromImage:image];
-        
-        // 2.4 创建一个占位对象
-        PHObjectPlaceholder *placeholder = [assetRequest placeholderForCreatedAsset];
-        
-        // 2.5 将占位对象添加到相册请求中
-        [collectionRequest addAssets:@[placeholder]];
-    
-    } completionHandler:^(BOOL success, NSError * _Nullable error) {
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-//            [_captureButton setEnabled:YES];
-            self.finishBoard.enable = NO;
-
-        });
-
-        // 3. 判断是否出错, 如果报错, 声明保存不成功
-        if (error) {
-            // [SVProgressHUD showErrorWithStatus:@"保存失败"];
-        } else {
-            // [SVProgressHUD showSuccessWithStatus:@"保存成功"];
-        }
-    
-    }];
-}
-
-
-- (PHAssetCollection *)getCurrentPhotoCollectionWithTitle:(NSString *)collectionName {
-    
-    // 1. 创建搜索集合
-    PHFetchResult *result = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
-    
-    // 2. 遍历搜索集合并取出对应的相册
-    for (PHAssetCollection *assetCollection in result) {
-        
-        if ([assetCollection.localizedTitle containsString:collectionName]) {
-            return assetCollection;
-        }
-    }
-    
-    return nil;
+-(void)saveImageFailure{
+    self.finishBoard.enable = NO;
+    // [SVProgressHUD showErrorWithStatus:@"保存失败"];
 }
 
 -(void)configurationPhotoCamera{
@@ -620,18 +548,8 @@ typedef NS_ENUM(NSUInteger, SizeOfPictureType) {
     GPUImageStillCamera *photoCamera = [[GPUImageStillCamera alloc] initWithSessionPreset:AVCaptureSessionPresetHigh cameraPosition:AVCaptureDevicePositionFront];
     photoCamera.outputImageOrientation = UIDeviceOrientationPortrait;
     [photoCamera setHorizontallyMirrorFrontFacingCamera:YES];
-    /*
-     UIDeviceOrientationUnknown,
-     UIDeviceOrientationPortrait,            // Device oriented vertically, home button on the bottom
-     UIDeviceOrientationPortraitUpsideDown,  // Device oriented vertically, home button on the top
-     UIDeviceOrientationLandscapeLeft,       // Device oriented horizontally, home button on the right
-     UIDeviceOrientationLandscapeRight,      // Device oriented horizontally, home button on the left
-     UIDeviceOrientationFaceUp,              // Device oriented flat, face up
-     UIDeviceOrientationFaceDown             // Device oriented flat, face down
-     */
     
     _photoCamera = photoCamera;
-    
 
     // 创建最终预览View
     GPUImageView *photoPreview = [[GPUImageView alloc] initWithFrame:self.view.bounds];
@@ -647,26 +565,12 @@ typedef NS_ENUM(NSUInteger, SizeOfPictureType) {
     // 必须调用startCameraCapture，底层才会把采集到的视频源，渲染到GPUImageView中，就能显示了。
     // 开始采集视频
     [photoCamera startCameraCapture];
-    
-    /*
-     步骤 内容
-     第一步 创建预览View 即必须的GPUImageView
-     第二步 创建滤镜 即这里我们使用的 GPUImageSketchFilter(黑白反色)
-     第三步 创建Camera 即我们要用到的GPUImageStillCamera
-     第四步 addTarget 并开始处理startCameraCapture
-     第五步 回调数据、写入相册
-     */
 
 }
 
 
 
--(NSString *)appName{
-    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
-    CFShow((__bridge CFTypeRef)(infoDictionary));
-    NSString *app_Name = [infoDictionary objectForKey:@"CFBundleName"];
-    return app_Name;
-}
+
 
 
 - (void)openFilter:(BOOL)open {
@@ -684,7 +588,6 @@ typedef NS_ENUM(NSUInteger, SizeOfPictureType) {
     } else {
         [_photoCamera addTarget:self.filterGroup];
         [_filterGroup addTarget:_captureVideoPreview];
-        
     }
     
 }

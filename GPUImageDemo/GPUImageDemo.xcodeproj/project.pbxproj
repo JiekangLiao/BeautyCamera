@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		041AE5E21FD8D5E9004761E7 /* PHManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 041AE5E11FD8D5E9004761E7 /* PHManager.m */; };
+		041AE5E61FD8DFF2004761E7 /* SystemInvestigator.m in Sources */ = {isa = PBXBuildFile; fileRef = 041AE5E51FD8DFF2004761E7 /* SystemInvestigator.m */; };
 		042004031FCEA43F004CC67D /* SandBoxProcessTool.m in Sources */ = {isa = PBXBuildFile; fileRef = 042004021FCEA43F004CC67D /* SandBoxProcessTool.m */; };
 		04639CED1FCCEB56001F3553 /* GPUImageBeautifyFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 04639CEB1FCCEB56001F3553 /* GPUImageBeautifyFilter.m */; };
 		04639CF71FCD6E14001F3553 /* JKCircleProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 04639CF61FCD6E14001F3553 /* JKCircleProgressView.m */; };
@@ -45,6 +47,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		041AE5E01FD8D5E9004761E7 /* PHManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PHManager.h; sourceTree = "<group>"; };
+		041AE5E11FD8D5E9004761E7 /* PHManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PHManager.m; sourceTree = "<group>"; };
+		041AE5E41FD8DFF2004761E7 /* SystemInvestigator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SystemInvestigator.h; sourceTree = "<group>"; };
+		041AE5E51FD8DFF2004761E7 /* SystemInvestigator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SystemInvestigator.m; sourceTree = "<group>"; };
 		042004011FCEA43F004CC67D /* SandBoxProcessTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SandBoxProcessTool.h; sourceTree = "<group>"; };
 		042004021FCEA43F004CC67D /* SandBoxProcessTool.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SandBoxProcessTool.m; sourceTree = "<group>"; };
 		04639CEB1FCCEB56001F3553 /* GPUImageBeautifyFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GPUImageBeautifyFilter.m; sourceTree = "<group>"; };
@@ -113,6 +119,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		041AE5DF1FD8D5D9004761E7 /* PHManager */ = {
+			isa = PBXGroup;
+			children = (
+				041AE5E01FD8D5E9004761E7 /* PHManager.h */,
+				041AE5E11FD8D5E9004761E7 /* PHManager.m */,
+			);
+			path = PHManager;
+			sourceTree = "<group>";
+		};
+		041AE5E31FD8DFDE004761E7 /* SystemInvestigator */ = {
+			isa = PBXGroup;
+			children = (
+				041AE5E41FD8DFF2004761E7 /* SystemInvestigator.h */,
+				041AE5E51FD8DFF2004761E7 /* SystemInvestigator.m */,
+			);
+			path = SystemInvestigator;
+			sourceTree = "<group>";
+		};
 		04639CF11FCD4BF4001F3553 /* JKPressProgressCircleButton */ = {
 			isa = PBXGroup;
 			children = (
@@ -157,6 +181,8 @@
 				04639CEB1FCCEB56001F3553 /* GPUImageBeautifyFilter.m */,
 				042004011FCEA43F004CC67D /* SandBoxProcessTool.h */,
 				042004021FCEA43F004CC67D /* SandBoxProcessTool.m */,
+				041AE5E31FD8DFDE004761E7 /* SystemInvestigator */,
+				041AE5DF1FD8D5D9004761E7 /* PHManager */,
 				04F478161FCFA7A5007971B9 /* JKCameraComponents */,
 				04639CF11FCD4BF4001F3553 /* JKPressProgressCircleButton */,
 				04F381B71FCBB540006C5B37 /* Main.storyboard */,
@@ -423,8 +449,10 @@
 				04639CF71FCD6E14001F3553 /* JKCircleProgressView.m in Sources */,
 				0478FD2A1FD4D4A700EC04E7 /* JKCameraMoreFunction.m in Sources */,
 				042004031FCEA43F004CC67D /* SandBoxProcessTool.m in Sources */,
+				041AE5E21FD8D5E9004761E7 /* PHManager.m in Sources */,
 				04F381B31FCBB540006C5B37 /* AppDelegate.m in Sources */,
 				04639CFA1FCD757C001F3553 /* JKCameraButton.m in Sources */,
+				041AE5E61FD8DFF2004761E7 /* SystemInvestigator.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
